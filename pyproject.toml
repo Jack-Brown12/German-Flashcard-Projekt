@@ -1,11 +1,13 @@
 [project]
-name = "german-ai-flashcard-projekt"
+name = "German_AI_Flashcard_Projekt"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "fastapi>=0.124.4",
-    "fastapi-cli>=0.0.16",
-    "uvicorn>=0.38.0",
+description = "German AI Flashcard Project"
+authors = [
+    { name = "Jack Brown" }
 ]
+dependencies = [
+    "spacy==3.8.11",
+    "fastapi==0.124.4",
+    "uvicorn==0.38.0"
+]
+
