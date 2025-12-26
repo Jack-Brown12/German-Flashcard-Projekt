@@ -1,0 +1,123 @@
+[
+  {
+    "flashcard_id": 1,
+    "english_prompt": "I went home yesterday.",
+    "target_german": "Ich bin gestern nach Hause gegangen.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 2,
+    "english_prompt": "She has eaten already.",
+    "target_german": "Sie hat schon gegessen.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 3,
+    "english_prompt": "Today I am learning German.",
+    "target_german": "Heute lerne ich Deutsch.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 4,
+    "english_prompt": "After work, he goes to the gym.",
+    "target_german": "Nach der Arbeit geht er ins Fitnessstudio.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 5,
+    "english_prompt": "I know that he is coming tomorrow.",
+    "target_german": "Ich weiß, dass er morgen kommt.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 6,
+    "english_prompt": "She says that she doesn't have time.",
+    "target_german": "Sie sagt, dass sie keine Zeit hat.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 7,
+    "english_prompt": "The dog is sleeping on the couch.",
+    "target_german": "Der Hund schläft auf der Couch.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 8,
+    "english_prompt": "I like the city very much.",
+    "target_german": "Ich mag die Stadt sehr.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 9,
+    "english_prompt": "I am waiting for the bus.",
+    "target_german": "Ich warte auf den Bus.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
+  },
+  {
+    "flashcard_id": 10,
+    "english_prompt": "She is helping her friend.",
+    "target_german": "Sie hilft ihrer Freundin.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
+  },
+  {
+    "flashcard_id": 11,
+    "english_prompt": "Last week I flew to Berlin.",
+    "target_german": "Letzte Woche bin ich nach Berlin geflogen.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 12,
+    "english_prompt": "He has written three emails today.",
+    "target_german": "Er hat heute drei E-Mails geschrieben.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 13,
+    "english_prompt": "In the evening, we usually cook together.",
+    "target_german": "Am Abend kochen wir normalerweise zusammen.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 14,
+    "english_prompt": "At home, she speaks only German.",
+    "target_german": "Zu Hause spricht sie nur Deutsch.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 15,
+    "english_prompt": "I believe that they have already left.",
+    "target_german": "Ich glaube, dass sie schon gegangen sind.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 16,
+    "english_prompt": "He is happy that his sister is visiting him.",
+    "target_german": "Er freut sich, dass seine Schwester ihn besucht.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 17,
+    "english_prompt": "The teacher explains the problem clearly.",
+    "target_german": "Der Lehrer erklärt das Problem deutlich.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 18,
+    "english_prompt": "We discussed the plan during the meeting.",
+    "target_german": "Wir haben den Plan während der Besprechung diskutiert.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 19,
+    "english_prompt": "He puts the book on the table.",
+    "target_german": "Er legt das Buch auf den Tisch.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
+  },
+  {
+    "flashcard_id": 20,
+    "english_prompt": "The book is lying on the table.",
+    "target_german": "Das Buch liegt auf dem Tisch.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
+  }
+]
+
