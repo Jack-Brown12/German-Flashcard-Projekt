@@ -1,3 +1,8 @@
+import json
+from pathlib import Path
+
+from app.evaluator import evaluate_translation
+
 from enum import Enum
 from typing import List, Optional
 
@@ -10,13 +15,13 @@ class GrammarFocus(Enum):
     PERFEKT_AUXILIARY = "perfekt_auxiliary_sein_vs_haben"
     MAIN_CLAUSE_V2 = "verb_position_main_clause_v2"
     SUBORDINATE_VERB_FINAL = "verb_position_subordinate_clause"
-    NOUN_CappTALIZATION = "noun_capptalization"
+    NOUN_CAPITALIZATION= "noun_capitalization"
     ACCUSATIVE_DATIVE_PREPOSITIONS = "accusative_vs_dative_prepositions"
 
 class FlashcardBase(BaseModel):
     english_prompt : str = Field(..., min_length=10, max_length=256, description='English text for flashcard')
     target_german : str = Field(..., description='Ideal german translation of flashcard')
-    grammar_focus : GrammarFocus = Field(default=None, description='Grammar concept flashcard targets')
+    grammar_focus : GrammarFocus = Field(..., description='Grammar concept flashcard targets')
 
 class FlashcardCreate(FlashcardBase):
     pass
@@ -29,19 +34,18 @@ class FlashcardUpdate(BaseModel):
     target_german : Optional[str] = Field(None,description='Ideal german translation of flashcard')
     grammar_focus : Optional[GrammarFocus] = Field(None, description='Grammar concept flashcard targets')
 
+DATA_PATH = Path("flashcards.json")
+def load_flashcards():
+    with open(DATA_PATH, "r") as f:
+        raw = json.load(f)
+        return [Flashcard(**fc) for fc in raw]
 
-all_flashcards = [
-    Flashcard(flashcard_id=1, english_prompt="I went home yesterday.", target_german="Ich bin gestern nach Hause gegangen.", grammar_focus=GrammarFocus.PERFEKT_AUXILIARY),
-    Flashcard(flashcard_id=2, english_prompt="She has eaten already.", target_german="Sie hat schon gegessen.", grammar_focus=GrammarFocus.PERFEKT_AUXILIARY),
-    Flashcard(flashcard_id=3, english_prompt="Today I am learning German.", target_german="Heute lerne ich Deutsch.", grammar_focus=GrammarFocus.MAIN_CLAUSE_V2),
-    Flashcard(flashcard_id=4, english_prompt="After work, he goes to the gym.", target_german="Nach der Arbeit geht er ins Fitnessstudio.", grammar_focus=GrammarFocus.MAIN_CLAUSE_V2),
-    Flashcard(flashcard_id=5, english_prompt="I know that he is coming tomorrow.", target_german="Ich weiß, dass er morgen kommt.", grammar_focus=GrammarFocus.SUBORDINATE_VERB_FINAL),
-    Flashcard(flashcard_id=6, english_prompt="She says that she doesn’t have time.", target_german="Sie sagt, dass sie keine Zeit hat.", grammar_focus=GrammarFocus.SUBORDINATE_VERB_FINAL),
-    Flashcard(flashcard_id=7, english_prompt="The dog is sleeping on the couch.", target_german="Der Hund schläft auf der Couch.", grammar_focus=GrammarFocus.NOUN_CappTALIZATION),
-    Flashcard(flashcard_id=8, english_prompt="I like the city very much.", target_german="Ich mag die Stadt sehr.", grammar_focus=GrammarFocus.NOUN_CappTALIZATION),
-    Flashcard(flashcard_id=9, english_prompt="I am waiting for the bus.", target_german="Ich warte auf den Bus.", grammar_focus=GrammarFocus.ACCUSATIVE_DATIVE_PREPOSITIONS),
-    Flashcard(flashcard_id=10, english_prompt="She is helping her friend.", target_german="Sie hilft ihrer Freundin.", grammar_focus=GrammarFocus.ACCUSATIVE_DATIVE_PREPOSITIONS),
-]
+all_flashcards = load_flashcards()
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 
 @app.get('/flashcards/{flashcard_id}', response_model=Flashcard)
 def get_flashcard(flashcard_id : int):
@@ -91,4 +95,21 @@ def delete_flashcard(flashcard_id : int):
         if flashcard.flashcard_id == flashcard_id:
             return all_flashcards.pop(index)
         
+    raise HTTPException(status_code=404, detail='Flashcard not found')
+
+class UserResponse(BaseModel):
+    user_german : str = Field(..., max_length=100, description='User answer to flashcard')
+    flashcard_id : int = Field(..., description='current flashcard')
+
+@app.post('/evaluate', response_model=list)
+def get_user_response(response: UserResponse):
+    for fc in all_flashcards:
+        if fc.flashcard_id == response.flashcard_id:
+            analysis = evaluate_translation(
+                user_german= response.user_german,
+                target_german=fc.target_german,
+                grammar_focus=fc.grammar_focus.value
+            )   
+            return analysis
+     
     raise HTTPException(status_code=404, detail='Flashcard not found')
