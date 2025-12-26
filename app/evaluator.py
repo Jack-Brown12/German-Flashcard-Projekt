@@ -16,6 +16,7 @@ class GrammarErrorType(Enum):
     ACCUSATIVE_DATIVE = "accusative_dative_prepositions"
     SPELLING = "spelling"
     INVALID_SENTANCE = "invalid_sentance"
+    NEAR_MISS = "near_miss" 
 
 
 @dataclass
@@ -71,13 +72,17 @@ def evaluate_translation(user_german: str, target_german: str, grammar_focus: st
 
     # 0. Refuse nonsense sentances that don't align with target answer
     if is_invalid_attempt(doc, target_doc):
-        return [
+        return {
+        "meaning_conveyed": False,
+        "correct_sentence": target_german,
+        "errors": [
             GrammarResult(
-                error_type=GrammarErrorType.INVALID_SENTANCE,
-                message= f"The correct sentence is: {target_german}",
+                error_type=GrammarErrorType.INVALID_SENTENCE,
+                message=f"Your sentence does not match the target meaning.",
                 blocking=True
             )
         ]
+    }
 
 
     # 1. Spelling (block early)
@@ -96,25 +101,28 @@ def evaluate_translation(user_german: str, target_german: str, grammar_focus: st
     results.extend(check_perfekt_auxiliary(doc))
     results.extend(check_accusative_dative_prepositions(doc, target_doc))
 
-    # One final check. Stops nonsense words from sneaking by checker.
+    # 4. Final check. Stops nonsense words from sneaking by checker.
     if final_word_check(doc, target_doc):
         results.extend([
             GrammarResult(
-                error_type=GrammarErrorType.INVALID_SENTANCE,
-                message= f"Very close! The correct sentence is: {target_german}",
+                error_type=GrammarErrorType.NEAR_MISS,
+                message= f"Very close! You are a few words off.",
                 blocking=False
             )]
         )
 
     if not results:
-        return [
-            GrammarResult(
-                error_type=None,
-                message="No grammar errors detected. Well done."
-            )
-        ]
+       return {
+        "meaning_conveyed": True,
+        "correct_sentence": target_german,
+        "errors": []
+    }
 
-    return results[:5] # Maximum 5 Error Messages at once --> don't overwhelm user
+    return {
+        "meaning_conveyed": False,
+        "correct_sentence": target_german,
+        "errors": results[:5], # Maximum 5 Error Messages at once --> don't overwhelm user
+    } 
 
 _spell = None
 
@@ -159,7 +167,7 @@ CONTENT_POS = {"NOUN", "VERB", "ADJ", "ADV", "PROPN"}
 def is_invalid_attempt(
     user_doc,
     target_doc,
-    min_coverage=0.75,
+    min_coverage=0.60,
     max_extra=2,
     max_core_extra=1,
     max_modifier_extra=2
@@ -259,7 +267,7 @@ def check_noun_capitalization(doc):
 def check_perfekt_auxiliary(doc):
     error_code = _violates_perfekt_auxiliary(doc)
     if not error_code:
-        return []
+        return None
 
     return [
         GrammarResult(
@@ -328,7 +336,7 @@ def _violates_perfekt_auxiliary(doc):
             error_code = 'HABEN_ERROR'
     
     if not error_code:
-            return []
+            return None
 
     return error_code
 

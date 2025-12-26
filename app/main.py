@@ -101,7 +101,7 @@ class UserResponse(BaseModel):
     user_german : str = Field(..., max_length=100, description='User answer to flashcard')
     flashcard_id : int = Field(..., description='current flashcard')
 
-@app.post('/evaluate', response_model=list)
+@app.post('/evaluate', response_model=dict)
 def get_user_response(response: UserResponse):
     for fc in all_flashcards:
         if fc.flashcard_id == response.flashcard_id:
