@@ -6,7 +6,7 @@ import pytest
 # Stub spacy.load to avoid requiring the German model during import.
 import spacy
 def _dummy_spacy_load(name):
-	# Return a callable that won't be used by our tests (we build FakeDocs manually).
+	# Return a callable that won't be used by tests to emulate spacy load
 	class DummyNLP:
 		def __call__(self, text):
 			return None
@@ -14,11 +14,10 @@ def _dummy_spacy_load(name):
 
 spacy.load = _dummy_spacy_load
 
-# Now import the module under test.
 from app import evaluator
 
 
-### --- Helpers: lightweight fake tokens/docs used by tests ---
+##  Helpers: lightweight fake tokens/docs used by tests 
 
 class MorphFake:
 	def __init__(self, mapping=None):
@@ -298,7 +297,7 @@ def test_end_to_end_evaluate_translation_with_real_spacy():
 	user = "Ich habe gestern nach Hause gegangen."
 	target = "Ich bin gestern nach Hause gegangen."
 	res = evaluator_module.evaluate_translation(user, target)
-	# should return at least one GrammarResult; expect a PERFEKT_AUXILIARY among them
+	# should return at least one GrammarResult (expect a PERFEKT_AUXILIARY)
 	assert isinstance(res, dict)
 	errors = res.get("errors", [])
 	assert any(e["type"] == evaluator_module.GrammarErrorType.PERFEKT_AUXILIARY.value for e in errors)
