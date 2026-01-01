@@ -237,10 +237,10 @@ def test_integration_check_noun_capitalization():
 	nlp = _get_real_nlp_or_skip()
 	doc = nlp("Ich spiele videospiele und basketball")
 	res = evaluator.check_noun_capitalization(doc)
-	assert len(res) == 1
-	# details should include the two uncapitalized nouns
+	assert len(res) == 2
+	# details should include the two uncapitalized nouns in different Error objects
 	assert 'videospiele' in res[0].details
-	assert 'basketball' in res[0].details
+	assert 'basketball' in res[1].details
 
 def test_integration_perfekt_auxiliary_correct():
 	nlp = _get_real_nlp_or_skip()
@@ -297,8 +297,8 @@ def test_end_to_end_evaluate_translation_with_real_spacy():
 
 	user = "Ich habe gestern nach Hause gegangen."
 	target = "Ich bin gestern nach Hause gegangen."
-	res = evaluator_module.evaluate_translation(user, target, grammar_focus='')
+	res = evaluator_module.evaluate_translation(user, target)
 	# should return at least one GrammarResult; expect a PERFEKT_AUXILIARY among them
-	assert isinstance(res, list)
-	assert any(r.error_type == evaluator_module.GrammarErrorType.PERFEKT_AUXILIARY for r in res)
-
+	assert isinstance(res, dict)
+	errors = res.get("errors", [])
+	assert any(e["type"] == evaluator_module.GrammarErrorType.PERFEKT_AUXILIARY.value for e in errors)

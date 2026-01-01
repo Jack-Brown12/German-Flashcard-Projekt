@@ -118,6 +118,127 @@
     "english_prompt": "The book is lying on the table.",
     "target_german": "Das Buch liegt auf dem Tisch.",
     "grammar_focus": "accusative_vs_dative_prepositions"
+  },
+  {
+    "flashcard_id": 21,
+    "english_prompt": "I went to the supermarket this morning.",
+    "target_german": "Ich bin heute Morgen zum Supermarkt gegangen.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 22,
+    "english_prompt": "She has bought a new dress.",
+    "target_german": "Sie hat ein neues Kleid gekauft.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 23,
+    "english_prompt": "We are reading a book now.",
+    "target_german": "Wir lesen jetzt ein Buch.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 24,
+    "english_prompt": "After school, he plays football.",
+    "target_german": "Nach der Schule spielt er Fußball.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 25,
+    "english_prompt": "I think that she is tired.",
+    "target_german": "Ich denke, dass sie müde ist.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 26,
+    "english_prompt": "He says that he likes chocolate.",
+    "target_german": "Er sagt, dass er Schokolade mag.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 27,
+    "english_prompt": "The cat is sitting on the chair.",
+    "target_german": "Die Katze sitzt auf dem Stuhl.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 28,
+    "english_prompt": "I enjoy the park very much.",
+    "target_german": "Ich genieße den Park sehr.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 29,
+    "english_prompt": "I am waiting for my friend.",
+    "target_german": "Ich warte auf meinen Freund.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
+  },
+  {
+    "flashcard_id": 30,
+    "english_prompt": "She is giving her brother a gift.",
+    "target_german": "Sie gibt ihrem Bruder ein Geschenk.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
+  },
+  {
+    "flashcard_id": 31,
+    "english_prompt": "Yesterday I drove to Munich.",
+    "target_german": "Gestern bin ich nach München gefahren.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 32,
+    "english_prompt": "He has read the newspaper.",
+    "target_german": "Er hat die Zeitung gelesen.",
+    "grammar_focus": "perfekt_auxiliary_sein_vs_haben"
+  },
+  {
+    "flashcard_id": 33,
+    "english_prompt": "In the morning, we drink coffee together.",
+    "target_german": "Am Morgen trinken wir zusammen Kaffee.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 34,
+    "english_prompt": "At home, he listens to music.",
+    "target_german": "Zu Hause hört er Musik.",
+    "grammar_focus": "verb_position_main_clause_v2"
+  },
+  {
+    "flashcard_id": 35,
+    "english_prompt": "I hope that it will not rain tomorrow.",
+    "target_german": "Ich hoffe, dass es morgen nicht regnet.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 36,
+    "english_prompt": "She is happy that her parents are visiting.",
+    "target_german": "Sie freut sich, dass ihre Eltern zu Besuch kommen.",
+    "grammar_focus": "verb_position_subordinate_clause"
+  },
+  {
+    "flashcard_id": 37,
+    "english_prompt": "The student writes the answer clearly.",
+    "target_german": "Der Schüler schreibt die Antwort deutlich.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 38,
+    "english_prompt": "We talked about the trip yesterday.",
+    "target_german": "Wir haben gestern über die Reise gesprochen.",
+    "grammar_focus": "noun_capitalization"
+  },
+  {
+    "flashcard_id": 39,
+    "english_prompt": "He puts the keys in his bag.",
+    "target_german": "Er legt die Schlüssel in seine Tasche.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
+  },
+  {
+    "flashcard_id": 40,
+    "english_prompt": "The keys are in the bag.",
+    "target_german": "Die Schlüssel sind in der Tasche.",
+    "grammar_focus": "accusative_vs_dative_prepositions"
   }
 ]
+
 

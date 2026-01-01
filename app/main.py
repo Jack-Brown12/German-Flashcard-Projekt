@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.evaluator import evaluate_translation
 
 from enum import Enum
@@ -10,6 +13,17 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field  
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",   # Vite default
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class GrammarFocus(Enum):
     PERFEKT_AUXILIARY = "perfekt_auxiliary_sein_vs_haben"
@@ -60,7 +74,12 @@ def get_list_flashcards(first_n: int = None):
         return all_flashcards[:first_n]
     else:
         return all_flashcards
-    
+
+@app.get('/cards', response_model=int)
+def get_num_flashcards():
+    return len(all_flashcards)
+
+
 @app.post('/flashcards', response_model=Flashcard)
 def create_flashcard(flashcard : FlashcardCreate):
     new_flashcard_id = max([fc.flashcard_id for fc in all_flashcards]) + 1
@@ -108,7 +127,6 @@ def get_user_response(response: UserResponse):
             analysis = evaluate_translation(
                 user_german= response.user_german,
                 target_german=fc.target_german,
-                grammar_focus=fc.grammar_focus.value
             )   
             return analysis
      

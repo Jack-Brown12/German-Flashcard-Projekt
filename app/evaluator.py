@@ -83,13 +83,27 @@ GRAMMAR_MESSAGES = {
     }
 }
 
+def normalize_text(text: str) -> str:
+    text = text.strip()
+    if not text:
+        return text
+    if text[-1] not in ".!?":
+        return text + "."
+    return text.strip()
+
 def evaluate_translation(user_german: str, target_german: str) -> dict:
     """Evaluate a German sentence for grammar mistakes and meaning."""
+    user_german = normalize_text(user_german)
 
     doc = nlp(user_german)
     target_doc = nlp(target_german)
 
-    tokens = [t.text for t in doc]
+    tokens = []
+    for t in doc:
+        if t.is_punct:
+            tokens.append(t.text)  # punctuation stays separate
+        else:
+            tokens.append(t.text)
     results = []
 
     def serialize(results):
@@ -229,7 +243,7 @@ def check_misspelled_words(doc, target_doc):
                     message=f"'{token.text}' may be misspelled. Did you mean '{suggestion}'?",
                     spans=[token.i],
                     details={"token": token.text, "suggestion": suggestion},
-                    blocking=True,
+                    blocking=False,
                     priority=ERROR_PRIORITY[GrammarErrorType.SPELLING],
                 )
             )
@@ -347,6 +361,7 @@ def check_noun_capitalization(doc):
                     message=GRAMMAR_MESSAGES["noun_capitalization"]["ERROR"],
                     spans=[token.i],
                     blocking=False,
+                    details=token.text,
                     priority=ERROR_PRIORITY[GrammarErrorType.NOUN_CAPITALIZATION],
                 )
             )
@@ -490,32 +505,36 @@ def get_finite_verb(sent):
             return token
         
 def check_subordinate_verb_final(doc):
-    if not _violates_subordinate_verb_final(doc):
+    (passed_test, verb_index) = _violates_subordinate_verb_final(doc)
+    if not passed_test:
         return []
 
     return [
         GrammarResult(
             error_type=GrammarErrorType.SUBORDINATE_VERB_FINAL,
             message=GRAMMAR_MESSAGES["subordinate_verb_final"]["ERROR"],
-            blocking=True,
+            blocking=False,
             priority=ERROR_PRIORITY[GrammarErrorType.SUBORDINATE_VERB_FINAL],
+            spans=[verb_index]
         )
     ]
 
 def _violates_subordinate_verb_final(doc):
     sent = list(doc.sents)[0]
+    verb_index = -1
     subordinate_verb = None
     for token in sent:
-        if token.pos_ == "VERB" and "Fin" in token.morph.get("VerbForm"):
+         if token.pos_ in ["VERB", "AUX"] and "Fin" in token.morph.get("VerbForm"):
             temp_subtree = list(token.subtree)
             if any(t.pos_ == "SCONJ" for t in temp_subtree):
                 subordinate_verb = token
+                verb_index = int(token.i)
     
     if subordinate_verb:
         subordinate_verb_tree = list(subordinate_verb.subtree)
-        return (subordinate_verb_tree[-1] != subordinate_verb)
+        return ((subordinate_verb_tree[-1] != subordinate_verb), verb_index)
 
-    return False
+    return (False, verb_index)
 
 def check_accusative_dative_prepositions(user_doc, target_doc):
     results = []
@@ -587,9 +606,6 @@ def check_extra_words(user_doc, target_doc, protected_spans):
 
         if token.i in protected_spans:
             continue  # already explained elsewhere
-
-        if token.pos_ in {"AUX"}:
-            continue  # NEVER mark auxiliaries as extra
 
         if token.lemma_.lower() not in target_lemmas:
             results.append(
