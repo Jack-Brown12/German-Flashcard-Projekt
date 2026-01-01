@@ -1,0 +1,275 @@
+/* Layout Containers */
+
+.landing {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative; 
+  background: #F7F7F7;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.content-container {
+  position: relative;     /* This is the anchor for the German flag */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  height: 100vh;         /* Take up full screen */
+  width: 100%;
+  z-index: 5;
+}
+
+.flag-bg-strip {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100vw;
+  height: 120px;
+  z-index: -1;
+
+  background-image: url("https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg");
+  
+  
+  background-size: contain;      
+  background-repeat: repeat-x;   
+  background-position: center;
+
+}
+
+/*  Background Elements  */
+
+.flag-img {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  
+  width: 100vw;      
+  height: 120px;     
+  object-fit: fill;   
+  z-index: 1; 
+  display: block;    
+  border: 5px solid red;    
+}
+
+/*  Components  */
+
+.landing-card {
+  background: white;
+  padding: 48px 40px;
+  border-radius: 28px;
+  max-width: 400px;
+  width: 90%;
+  z-index: 10;
+  
+  /* Centering the content inside the card */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+}
+
+.title-text h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #3c3c3c;
+}
+
+/*  Buttons & Base */
+
+.start-btn {
+  background: #58cc02;
+  color: white;
+  border: none;
+  border-radius: 18px;
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 1.5rem; /* Space above button */
+  transition: transform 0.05s ease, box-shadow 0.1s ease;
+}
+
+.start-btn:hover {
+  box-shadow: 0 6px 16px rgba(88, 204, 2, 0.4);
+}
+
+.start-btn:active {
+  transform: translateY(1px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Nunito", system-ui, -apple-system, sans-serif;
+  background: #f7f7f7;
+  color: #3c3c3c;
+}
+
+/*  App Layout  */
+.app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 96px 16px 120px;
+}
+
+
+/*  Card  */
+.flashcard-card {
+  background: #f2f2f2;
+  border: 2px solid #d6d6d6;
+  border-radius: 20px;
+
+  padding: 32px;
+  min-height: 220px;  
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  margin: 64px auto 24px;
+}
+
+
+
+.flashcard-card h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/*  Input  */
+.answer-input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 18px;
+  border-radius: 16px;
+  border: 2px solid #e5e5e5;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.answer-input:focus {
+  border-color: #58cc02; /* Duolingo green */
+}
+
+.answer-input:disabled {
+  background: #f0f0f0;
+}
+
+/*  Buttons  */
+button {
+  font-family: inherit;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  background: #58cc02;
+  color: white;
+  box-shadow: 0 4px 0 #46a302;
+}
+
+.primary-btn:disabled {
+  background: #cfcfcf;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.primary-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #46a302;
+}
+.primary-btn:hover:not(:disabled) {
+  background: #61E001;
+}
+
+/*  Navigation */
+.flashcard-nav-wrapper {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+
+.flashcard-nav {
+  display: inline-flex; 
+  align-items: center;
+  gap: 12px;
+
+  background: #ffffff;
+  padding: 10px;       
+  border-radius: 22px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+
+/* Buttons */
+.flashcard-nav button {
+  padding: 10px 16px;
+  border-radius: 16px;
+  border: none;
+
+  background: #e5e5e5;
+  font-weight: 700;
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.flashcard-nav button:hover {
+  background: #dcdcdc;
+}
+
+.flashcard-nav button:active {
+  transform: translateY(1px);
+}
+
+/* Input */
+.flashcard-nav input {
+  width: 72px;
+  text-align: center;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 2px solid #e5e5e5;
+
+  font-weight: 700;
+  font-size: 14px;
+  outline: none;
+}
+
+.flashcard-nav input:focus {
+  border-color: #58cc02; /* Duolingo green */
+}
+
+/*  Tokens  */
+.token {
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+
+.token.highlight {
+  background: #ffd43b;
+}
+
+/*  Modal colors are handled seperately  */

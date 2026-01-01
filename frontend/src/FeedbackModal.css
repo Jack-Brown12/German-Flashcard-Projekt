@@ -1,0 +1,188 @@
+/* Backdrop */
+.modal-backdrop {
+ position: fixed;
+ inset: 0;
+ background: rgba(0,0,0,0.45);
+ z-index: 999;
+}
+
+
+/* Bottom sheet */
+.bottom-sheet {
+ position: fixed;
+ bottom: 0;
+ left: 0;
+ right: 0;
+ width: 100%;
+ max-width: 100%;
+ z-index: 1000;
+
+ /* Padding: Top, Sides, Bottom (Increased bottom for thumb clearance) */
+ padding: 8px 40px 60px;
+
+ background: white;
+ border-top-left-radius: 24px;
+ border-top-right-radius: 24px;
+ box-shadow: 0 -8px 30px rgba(0,0,0,0.25);
+  /* Allow scrolling if content exceeds the dynamic height */
+ overflow-y: auto;
+ transition: height 0.3s ease-out;
+ animation: slideUp 0.25s ease-out forwards;
+}
+
+
+/* Layout Wrapper: Text left, Button right */
+.sheet-main-layout {
+ display: flex;
+ flex-direction: row;
+ justify-content: space-between;
+ align-items: center; /* Vertically centers the button vs the text block */
+ gap: 30px;
+ max-width: 1200px;
+ margin: 0 auto;
+}
+
+
+/* Container for all text elements */
+.content-left {
+ flex: 1;
+ display: flex;
+ flex-direction: column;
+}
+
+
+/* Slide animation */
+@keyframes slideUp {
+ from { transform: translateY(100%); }
+ to { transform: translateY(0); }
+}
+
+
+/* Handle at the top */
+.sheet-handle {
+ width: 40px;
+ height: 4px;
+ background: rgba(0,0,0,0.1);
+ border-radius: 2px;
+ margin: 0 auto 16px;
+ flex-shrink: 0;
+}
+
+
+/* Text & Spacing Toggles */
+
+
+.content-left h2 {
+ margin: 0 0 8px 0;
+ font-size: 24px;
+ font-weight: 800;
+}
+
+
+.content-left h3 {
+ margin: 16px 0 4px 0; /* Tightened space after "Issues" and "Feedback" */
+ font-size: 16px;
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ opacity: 0.9;
+}
+
+
+.correct-sentence,
+.user-sentence-line {
+ margin-bottom: 4px; /* Reduced white space between lines */
+ word-break: break-word;
+ display: block;
+ line-height: 1.4;
+}
+
+
+.content-left ul {
+ margin: 0;
+ padding-left: 20px;
+}
+
+
+.content-left li {
+ margin-bottom: 4px;
+}
+
+
+.active-issue {
+ font-weight: bold;
+}
+
+
+/* Tokens */
+.tokens {
+ display: flex;
+ flex-wrap: wrap;
+ line-height: 1.6;
+}
+.token {
+ margin-right: 2px;
+}
+
+
+/* --- Status Themes --- */
+
+
+.bottom-sheet.correct { background: #D7FFB8; color: #43A047; }
+.bottom-sheet.warning { background: #FFF4D1; color: #9E7F00; }
+.bottom-sheet.blocking { background: #FFDFDF; color: #EA2B2B; }
+
+
+/* Relative Continue Button */
+.continue-btn {
+ position: relative;
+ flex-shrink: 0; /* Prevents button from shrinking */
+  width: 160px;
+ height: 50px;
+
+
+ border: none;
+ border-radius: 16px;
+ font-weight: 800;
+ font-size: 16px;
+ text-transform: uppercase;
+ letter-spacing: 0.8px;
+ cursor: pointer;
+ color: white;
+  /* Duolingo style 3D shadow */
+ box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+ transition: transform 0.1s, box-shadow 0.1s;
+}
+
+
+/* Button State Colors */
+.bottom-sheet.correct .continue-btn {
+ background: #58CC02;
+ box-shadow: 0 4px 0 #46A302;
+}
+.bottom-sheet.warning .continue-btn {
+ background: #FFC800;
+ box-shadow: 0 4px 0 #E5B300;
+}
+.bottom-sheet.blocking .continue-btn {
+ background: #FF4B4B;
+ box-shadow: 0 4px 0 #EA2B2B;
+}
+
+/* Buttons lighten upon hover */
+.bottom-sheet.correct .continue-btn:hover {
+ background: #61E001;
+}
+.bottom-sheet.warning .continue-btn:hover {
+ background: #fccd23;
+}
+.bottom-sheet.blocking .continue-btn:hover {
+ background: #fa5f5f;
+}
+
+
+.continue-btn:active {
+ transform: translateY(4px);
+ box-shadow: 0 0 0 transparent;
+}
+
+
