@@ -5,6 +5,7 @@ import FeedbackModal from "./FeedbackModal.jsx"
 import api from "./api"
 
 function App() {
+  const [allCards, setAllCards] = useState([]);
   const [totalCards, setTotalCards] = useState(0);
   const [number, setNumber] = useState(1);
   const [card, setCard] = useState(null);
@@ -16,41 +17,41 @@ function App() {
 
   const inputRef = useRef(null);
 
-  // Fetch total cards on mount
+  // Fetchs everything once on load
   useEffect(() => {
-    const fetchTotalCards = async () => {
+    const fetchAllData = async () => {
       try {
-        const res = await api.get("/flashcards"); // assuming returns array
-        setTotalCards(res.data.length);
+        const res = await api.get("/flashcards");
+        const cards = res.data;
+        setAllCards(cards);
+        setTotalCards(cards.length);
+        
+        // Set the initial card immediately
+        if (cards.length > 0) {
+          setCard(cards[0]);
+        }
       } catch (err) {
-        console.error("Failed to fetch total cards:", err);
+        console.error("Failed to fetch cards:", err);
       }
     };
-    fetchTotalCards();
+    fetchAllData();
   }, []);
 
-  // Fetch current flashcard whenever `number` changes
+ 
   useEffect(() => {
-    const loadCard = async () => {
+    if (allCards.length > 0) {
+      
+      setCard(allCards[number - 1]);
+      
       setAnswer("");
       setEvaluation(null);
       setIsSubmitted(false);
       setIsSubmitting(false);
 
-      try {
-        const res = await api.get(`/flashcards/${number}`);
-        setCard(res.data);
-
-        // focus input after card loads
-        requestAnimationFrame(() => inputRef.current?.focus());
-      } catch (err) {
-        console.error("Failed to fetch card:", err);
-      }
-    };
-    if (totalCards > 0) {
-      loadCard();
+      // Focus input
+      requestAnimationFrame(() => inputRef.current?.focus());
     }
-  }, [number, totalCards]);
+  }, [number, allCards]);
 
   const handleSubmit = async () => {
     if (!answer.trim() || isSubmitting) return;
@@ -76,20 +77,22 @@ function App() {
     setEvaluation(null);
     setIsSubmitted(false);
 
-    // increment flashcard number, but don't exceed totalCards
     if (wasCorrect) {
       setNumber((n) => Math.min(n + 1, totalCards));
     }
 
-    // refocus input
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   return (
     <div className="app">
-      {card && <Flashcard card={card} />}
+      {/* Show card if loaded, otherwise a simple loading state */}
+      {card ? (
+        <Flashcard card={card} />
+      ) : (
+        <div className="loading-state">Lade Flashcards...</div>
+      )}
 
-      {/* User text bar */}
       <input
         ref={inputRef}
         className="answer-input"
@@ -100,6 +103,7 @@ function App() {
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             if (isSubmitted) {
+              // Move to next card on Enter if already submitted
               setNumber((n) => Math.min(n + 1, totalCards));
             } else {
               handleSubmit();
@@ -109,7 +113,6 @@ function App() {
         placeholder="Type your answer"
       />
 
-      {/* Submit button */}
       <button
         className="primary-btn"
         disabled={!answer.trim() || !card || isSubmitting || isSubmitted}
@@ -118,7 +121,6 @@ function App() {
         {isSubmitting ? "Checking..." : "Check"}
       </button>
 
-      {/* Flashcard search box */}
       {totalCards > 0 && (
         <FlashcardNav
           totalCards={totalCards}
@@ -127,7 +129,6 @@ function App() {
         />
       )}
 
-      {/* This is feedback display sourced from backend */}
       {evaluation && (
         <FeedbackModal evaluation={evaluation} onClose={handleCloseFeedback} />
       )}
