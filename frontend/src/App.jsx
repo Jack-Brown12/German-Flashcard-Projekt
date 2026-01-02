@@ -32,7 +32,6 @@ function App() {
   // Fetch current flashcard whenever `number` changes
   useEffect(() => {
     const loadCard = async () => {
-      setCard(null);
       setAnswer("");
       setEvaluation(null);
       setIsSubmitted(false);
