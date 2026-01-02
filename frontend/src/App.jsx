@@ -90,7 +90,7 @@ function App() {
       {card ? (
         <Flashcard card={card} />
       ) : (
-        <div className="loading-state">Lade Flashcards...</div>
+        <div className="loading-state">Loading Flashcards...</div>
       )}
 
       <input

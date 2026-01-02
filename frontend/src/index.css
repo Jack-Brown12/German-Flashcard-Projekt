@@ -141,12 +141,31 @@ body {
   margin: 64px auto 24px;
 }
 
-
-
 .flashcard-card h3 {
   margin: 0 0 12px;
   font-size: 18px;
   font-weight: 700;
+}
+
+.loading-state {
+  border: 2px solid #d6d6d6;
+  border-radius: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  height: 220px;
+  font-size: 1.2rem;
+  color: #666;
+  font-style: italic;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
 /*  Input  */
