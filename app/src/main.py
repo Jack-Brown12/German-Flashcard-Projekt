@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.evaluator import evaluate_translation
+from app.src.evaluator import evaluate_translation
 
 from enum import Enum
 from typing import List, Optional
@@ -17,8 +17,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",   # Vite default
-        "http://127.0.0.1:5173",
+        "http://localhost:5174",   # Vite default
+        "http://127.0.0.1:5174",
         "https://german-flashcard-projekt.vercel.app" # Deployment
     ],
     allow_credentials=True,
@@ -49,7 +49,7 @@ class FlashcardUpdate(BaseModel):
     target_german : Optional[str] = Field(None,description='Ideal german translation of flashcard')
     grammar_focus : Optional[GrammarFocus] = Field(None, description='Grammar concept flashcard targets')
 
-DATA_PATH = Path("flashcards.json")
+DATA_PATH = Path(__file__).parent / "flashcards.json"
 def load_flashcards():
     with open(DATA_PATH, "r") as f:
         raw = json.load(f)

@@ -14,8 +14,7 @@ def _dummy_spacy_load(name):
 
 spacy.load = _dummy_spacy_load
 
-from app import evaluator
-
+import app.src.evaluator as evaluator
 
 ##  Helpers: lightweight fake tokens/docs used by tests 
 
@@ -291,7 +290,7 @@ def test_end_to_end_evaluate_translation_with_real_spacy():
 
 	# reload the evaluator module so its top-level `nlp` and `spell` are bound to
 	# the real spaCy model and real SpellChecker implementation
-	import app.evaluator as evaluator_module
+	import app.src.evaluator as evaluator_module
 	importlib.reload(evaluator_module)
 
 	user = "Ich habe gestern nach Hause gegangen."

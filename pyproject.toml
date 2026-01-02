@@ -1,0 +1,23 @@
+[project]
+name = "German_Flashcard_Projekt"
+version = "0.1.0"
+description = "German Flashcard Project"
+requires-python = ">=3.12"
+authors = [
+    { name = "Jack Brown" }
+]
+dependencies = [
+    "spacy>=3.8.0",
+    "fastapi[standard]>=0.115.0",
+    "uvicorn>=0.30.0",
+    "pyspellchecker>=0.8.4",
+    "de-core-news-md @ https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.8.0/de_core_news_md-3.8.0-py3-none-any.whl",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
+
+[tool.uv]
+package = false
