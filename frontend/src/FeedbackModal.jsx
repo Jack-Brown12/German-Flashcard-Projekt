@@ -27,7 +27,7 @@ function FeedbackModal({ evaluation, onClose }) {
 
 
  const hasBlocking = realErrors.some((e) => e.blocking);
- const hasErrors = realErrors.length > 0;
+ const hasErrors = realErrors.length > 0 || encouragements.length > 0; // flashes warning screen if any mistakes are detected
 
 
  let status = "correct";
@@ -100,8 +100,8 @@ function FeedbackModal({ evaluation, onClose }) {
              />
            </div>
 
-
-          {hasErrors && (
+          {/*Prints issues if there non-zero real errors*/}
+          {(hasErrors && realErrors.length > 0) && (
             <>
               <h2>Issues {status !== "blocking" && "(click to toggle highlights)"}</h2>
 
