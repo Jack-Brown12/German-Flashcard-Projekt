@@ -524,9 +524,9 @@ def _violates_subordinate_verb_final(doc):
     verb_index = -1
     subordinate_verb = None
     for token in sent:
-         if token.pos_ in ["VERB", "AUX"] and "Fin" in token.morph.get("VerbForm"):
-            temp_subtree = list(token.subtree)
-            if any(t.pos_ == "SCONJ" for t in temp_subtree):
+         if token.pos_ in ["VERB", "AUX"]:
+            temp_children = list(token.children)
+            if any(t.pos_ == "SCONJ" for t in temp_children):
                 subordinate_verb = token
                 verb_index = int(token.i)
     
@@ -594,8 +594,8 @@ def check_accusative_dative_prepositions(user_doc, target_doc):
 def check_extra_words(user_doc, target_doc, protected_spans):
     results = []
 
-    target_lemmas = {
-        t.lemma_.lower()
+    target_words = {
+        t.text.lower()
         for t in target_doc
         if t.is_alpha
     }
@@ -607,13 +607,14 @@ def check_extra_words(user_doc, target_doc, protected_spans):
         if token.i in protected_spans:
             continue  # already explained elsewhere
 
-        if token.lemma_.lower() not in target_lemmas:
+        if token.text.lower() not in target_words:
             results.append(
                 GrammarResult(
                     error_type=GrammarErrorType.WORD_OUT_OF_TARGET,
                     message=f"Extra word '{token.text}' not in target sentence",
                     spans=[token.i],
                     priority=90,
+                    blocking=False
                 )
             )
 
