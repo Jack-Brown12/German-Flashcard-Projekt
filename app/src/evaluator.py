@@ -259,7 +259,7 @@ def check_misspelled_words(doc, target_doc):
                 results.append(
                     GrammarResult(
                         error_type=GrammarErrorType.SPELLING,
-                        message=f"'{token.text}' looks like a misspelling of a target verb.",
+                        message=f"'{token.text}' looks like a misspelling of a crucial verb for grammar evaluation.",
                         spans=[token.i],
                         blocking=True,
                         priority=ERROR_PRIORITY[GrammarErrorType.SPELLING],
@@ -462,7 +462,7 @@ def check_main_clause_v2(doc):
             error_type=GrammarErrorType.MAIN_CLAUSE_V2,
             message=GRAMMAR_MESSAGES["main_clause_v2"]["ERROR"],
             spans=wrong_verb,
-            blocking=True,
+            blocking=False,
             priority=ERROR_PRIORITY[GrammarErrorType.MAIN_CLAUSE_V2],
         )
     ]
