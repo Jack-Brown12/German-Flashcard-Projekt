@@ -12,8 +12,10 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field  
 
+#initialize fastAPI
 app = FastAPI()
 
+#CORS Setup to communicate across ports/domains
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -49,7 +51,9 @@ class FlashcardUpdate(BaseModel):
     target_german : Optional[str] = Field(None,description='Ideal german translation of flashcard')
     grammar_focus : Optional[GrammarFocus] = Field(None, description='Grammar concept flashcard targets')
 
+# Finding path to JSON flashcards
 DATA_PATH = Path(__file__).parent / "flashcards.json"
+
 def load_flashcards():
     with open(DATA_PATH, "r") as f:
         raw = json.load(f)
@@ -61,7 +65,7 @@ all_flashcards = load_flashcards()
 def health_check():
     return {"status": "ok"}
 
-
+# Returns individual flashcard
 @app.get('/flashcards/{flashcard_id}', response_model=Flashcard)
 def get_flashcard(flashcard_id : int):
     for flashcard in all_flashcards:
@@ -69,6 +73,7 @@ def get_flashcard(flashcard_id : int):
             return flashcard
     raise HTTPException(status_code=404, detail='Flashcard not found')
 
+# Returns fixed list of flashcards 
 @app.get('/flashcards', response_model=List[Flashcard])
 def get_list_flashcards(first_n: int = None):
     if first_n:
@@ -76,11 +81,12 @@ def get_list_flashcards(first_n: int = None):
     else:
         return all_flashcards
 
+# Provides frontend with length of the flashcards array
 @app.get('/cards', response_model=int)
 def get_num_flashcards():
     return len(all_flashcards)
 
-
+# Creates new flashcard
 @app.post('/flashcards', response_model=Flashcard)
 def create_flashcard(flashcard : FlashcardCreate):
     new_flashcard_id = max([fc.flashcard_id for fc in all_flashcards]) + 1
@@ -95,6 +101,7 @@ def create_flashcard(flashcard : FlashcardCreate):
 
     return new_flashcard
 
+# Updates Flashcards
 @app.post('/flashcards/{flashcard_id}', response_model=Flashcard)
 def update_flashcard(flashcard_id : int, updated_flashcard : FlashcardUpdate):
     for flashcard in all_flashcards:
@@ -109,6 +116,7 @@ def update_flashcard(flashcard_id : int, updated_flashcard : FlashcardUpdate):
 
     raise HTTPException(status_code=404, detail='Flashcard not found')
 
+# Deletes Flashcard
 @app.delete('/flashcards/{flashcard_id}', response_model=Flashcard)
 def delete_flashcard(flashcard_id : int):
     for index, flashcard in enumerate(all_flashcards):
@@ -121,6 +129,7 @@ class UserResponse(BaseModel):
     user_german : str = Field(..., max_length=100, description='User answer to flashcard')
     flashcard_id : int = Field(..., description='current flashcard')
 
+# User's german response to be evaluated on the backend
 @app.post('/evaluate', response_model=dict)
 def get_user_response(response: UserResponse):
     for fc in all_flashcards:

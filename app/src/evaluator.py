@@ -6,13 +6,11 @@ from typing import Any, Optional
 from collections import Counter
 from difflib import SequenceMatcher
 
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
-
-
+# Loading spaCy's German NLP and Python spell checker
 nlp = spacy.load("de_core_news_md")
 spell = SpellChecker(language='de')
 
+# Enum that outlines all possible semantic/grammar errors this program could raise
 class GrammarErrorType(Enum):
     NOUN_CAPITALIZATION = "noun_capitalization"
     PERFEKT_AUXILIARY = "perfekt_auxiliary"
@@ -24,6 +22,7 @@ class GrammarErrorType(Enum):
     WORD_OUT_OF_TARGET = "word_out_of_target"
     NEAR_MISS = "near_miss" 
 
+# Subsequent priorities of these errors for priority ranking
 ERROR_PRIORITY = {
     GrammarErrorType.INVALID_SENTANCE: 100,
     GrammarErrorType.WORD_OUT_OF_TARGET: 90,
@@ -36,8 +35,7 @@ ERROR_PRIORITY = {
     GrammarErrorType.NEAR_MISS: 5,
 }
 
-
-
+# Each error is standardized as a GrammarResult, containing the following information:
 @dataclass
 class GrammarResult:
     error_type: GrammarErrorType
@@ -83,6 +81,7 @@ GRAMMAR_MESSAGES = {
     }
 }
 
+# Spacy fails to understand certain verbs when sentances do not end in a period. This is a hotfix.
 def normalize_text(text: str) -> str:
     text = text.strip()
     if not text:
@@ -101,11 +100,12 @@ def evaluate_translation(user_german: str, target_german: str) -> dict:
     tokens = []
     for t in doc:
         if t.is_punct:
-            tokens.append(t.text)  # punctuation stays separate
+            tokens.append(t.text)  # punctuation stays as separate tokens
         else:
             tokens.append(t.text)
     results = []
 
+    # This reinitializes the key-value pairs to insure consistent naming 
     def serialize(results):
         return [
             {
@@ -197,8 +197,12 @@ def evaluate_translation(user_german: str, target_german: str) -> dict:
     }
 
 
-_spell = None
 
+
+# Do not initialize the spell checker at import time
+# Pytest imports modules before running tests and this caused crashes
+# Initializing it only when needed avoids that
+_spell = None
 def get_spellchecker():
     global _spell
     if _spell is None:
@@ -279,6 +283,22 @@ def is_invalid_attempt(
     max_core_extra=1,
     max_modifier_extra=2
 ):
+    """
+    Returns True if the user's answer deviates too much from the target.
+
+    The check fails if the user covers too little of the target content,
+    adds too many extra words, uses a different main verb, or exceeds
+    allowed extra core or modifier words.
+
+    Parameters:
+        user_doc: spaCy Doc for the user's answer
+        target_doc: spaCy Doc for the expected answer
+        min_coverage: minimum fraction of target tokens that must appear
+        max_extra: maximum total extra tokens allowed
+        max_core_extra: maximum extra nouns verbs or proper nouns
+        max_modifier_extra: maximum extra adjectives or adverbs
+    """
+
     # Collect content tokens
     user_tokens = Counter(
         t.text.lower()
@@ -349,8 +369,12 @@ def is_invalid_attempt(
 
     return False
 
+# spaCy does not consider these words to be nouns when uncapitalized, so exceptions were made.
 ALLOWED_EDGE_CASES = {'deutsch', 'englisch'}
 def check_noun_capitalization(doc):
+    """
+    Flags lowercase nouns and proper nouns in a spaCy Doc.
+    """ 
     results = []
     for token in doc:
         if ((token.pos_ == 'NOUN' or token.pos_ == 'PROPN') and not token.is_oov) or token.text in ALLOWED_EDGE_CASES:
@@ -368,6 +392,12 @@ def check_noun_capitalization(doc):
     return results
 
 def check_perfekt_auxiliary(doc):
+    """
+    Checks whether the correct auxiliary verb is used in the Perfekt tense.
+
+    Returns a grammar error if "haben" or "sein" is used with the wrong
+    past participle.
+    """
     error_code, aux_index = _violates_perfekt_auxiliary(doc)
     if not error_code:
         return []
@@ -384,7 +414,13 @@ def check_perfekt_auxiliary(doc):
     ]
 
 def _violates_perfekt_auxiliary(doc):
-    
+    """
+    Determines whether a Perfekt construction violates auxiliary verb rules.
+
+    Uses a fixed list of verbs that require "sein" and assumes all others
+    require "haben". Returns an error code and the auxiliary token index.
+    """
+    # Comprehensive list of verbs that normally form Perfekt with "sein"-- good for beginners
     COMMON_SEIN_VERBS = [
         "sein",
         "werden",
@@ -425,10 +461,13 @@ def _violates_perfekt_auxiliary(doc):
         "altern",
         "verwelken"
     ]
+
     error_code = None
     aux_index = -1
     verb = ''
     aux = ''
+
+    # Extract the past participle and auxiliary verb
     for token in doc:
         if token.tag_ == 'VVPP' or token.tag_ == 'VAPP':
             verb = token.lemma_
@@ -436,6 +475,7 @@ def _violates_perfekt_auxiliary(doc):
             aux = token.lemma_
             aux_index = token.i
 
+    # Validate auxiliary choice
     if verb and aux:
         if verb in COMMON_SEIN_VERBS and aux != 'sein':
             error_code = 'SEIN_ERROR'
@@ -448,9 +488,17 @@ def _violates_perfekt_auxiliary(doc):
     return (error_code, aux_index)
 
 def check_main_clause_v2(doc):
+    """
+    Checks whether a German main clause violates the verb-second (V2) rule.
+
+    Returns a grammar error if the finite verb does not appear in the
+    second position of the clause.
+    """
     if not _violates_main_clause_v2(doc):
         return []
 
+    # IMPORTANT for highlighting which verb was placed in the wrong position. 
+    # This is then highlighten on the frontend when the error is selected by users.
     fin = get_finite_verb(doc)
     if fin:
         wrong_verb = [fin.i]
@@ -468,31 +516,43 @@ def check_main_clause_v2(doc):
     ]
 
 def _violates_main_clause_v2(doc):
+    """
+    Determines whether a sentence violates the V2 constraint.
+
+    Allows subject-initial clauses and full subject noun phrases in the
+    Vorfeld. Flags cases where extra material appears before the finite verb.
+    """
+
     sent = list(doc)
+
     common_valid_modifiers = ['nur', 'sehr', 'mit']
+
+    # This operates on the tenet that V2 must have a finite verb (no questions or imperitives)
     fin = get_finite_verb(sent)
     if not fin:
         return False
 
+    # Vorfeld: the words before the finite verb. 
+    # This should be one connected clause or V2 fails.
     vorfeld = [t for t in sent if t.i < fin.i and not t.is_punct]
     if not vorfeld:
         return False
 
-    # find subject
+    # Find subject
     subjects = [t for t in fin.children if t.dep_ == "sb"]
     if not subjects:
         return False
 
     sb = subjects[0]
 
-    # subject not in Vorfeld → fine
+    # Subject not in Vorfeld → fine
     if sb not in vorfeld:
         return False
 
-    # allow full subject NP
+    # Allow full subject NP
     subject_span = [t for t in vorfeld if t.dep_ in {'nk', 'sb'} or t.pos_ in {'DET', 'NOUN'} or t.text.lower() in common_valid_modifiers]
 
-    # if anything before the verb is not part of subject NP → violation
+    # If anything before the verb is not part of subject NP → violation
     for t in vorfeld:
         if t not in subject_span:
             return True
@@ -505,6 +565,13 @@ def get_finite_verb(sent):
             return token
         
 def check_subordinate_verb_final(doc):
+    """
+    Checks whether a subordinate clause violates the verb-final rule.
+
+    Returns a grammar error if the finite verb does not appear at the end
+    of the subordinate clause.
+    """
+
     (passed_test, verb_index) = _violates_subordinate_verb_final(doc)
     if not passed_test:
         return []
@@ -520,16 +587,26 @@ def check_subordinate_verb_final(doc):
     ]
 
 def _violates_subordinate_verb_final(doc):
+    """
+    Determines whether a subordinate clause violates verb-final order.
+
+    Identifies a verb that governs a subordinating conjunction and checks
+    whether that verb appears at the end of its clause.
+    """
     sent = list(doc.sents)[0]
     verb_index = -1
-    subordinate_verb = None
+    subordinate_verb = None # The verb that should be at the end of the sentance
     for token in sent:
          if token.pos_ in ["VERB", "AUX"]:
             temp_children = list(token.children)
-            if any(t.pos_ == "SCONJ" for t in temp_children):
+            if any(t.pos_ == "SCONJ" for t in temp_children): 
+                # Looking for the subordinating conjunction
+                # This subordinate verb must have the subordinating conjunction in its children.
+                # This is how we determine which verb is attactched to the conjunction.
                 subordinate_verb = token
                 verb_index = int(token.i)
     
+    # Check the last word to see if its the subordinate verb
     if subordinate_verb:
         subordinate_verb_tree = list(subordinate_verb.subtree)
         return ((subordinate_verb_tree[-1] != subordinate_verb), verb_index)
@@ -537,12 +614,21 @@ def _violates_subordinate_verb_final(doc):
     return (False, verb_index)
 
 def check_accusative_dative_prepositions(user_doc, target_doc):
+    """
+    Checks for incorrect accusative or dative case usage in determiners
+    and pronouns.
+
+    Compares the user's answer against the target and returns a grammar
+    error when the same pronoun type is used with the wrong grammatical case.
+    """
+
     results = []
 
-    # Collect DET/PRON tokens
+    # Collect determiners and pronouns from both documents
     user_tokens = [t for t in user_doc if t.pos_ in ('DET', 'PRON')]
     target_tokens = [t for t in target_doc if t.pos_ in ('DET', 'PRON')]
 
+    # Signature used to quickly compare lemma, POS, and case. Used immediately below:
     def sig(t):
         return (
             t.lemma_,
@@ -550,6 +636,7 @@ def check_accusative_dative_prepositions(user_doc, target_doc):
             tuple(t.morph.get("Case")),
         )
 
+    # Compare overall case usage first to skip identical answers
     user_sig = Counter(
         sig(t) for t in user_doc if t.pos_ in ("DET", "PRON")
     )
@@ -560,15 +647,17 @@ def check_accusative_dative_prepositions(user_doc, target_doc):
     if user_sig == target_sig:
         return []
 
+    # Compare corresponding pronouns and determiners
     for u_token, t_token in zip(user_tokens, target_tokens):
         u_error_type = u_token.morph.get('Pronerror_type')
         t_error_type = t_token.morph.get('Pronerror_type')
 
-        # Only compare tokens of the same pronoun error_type
+        # Only compare tokens of the same pronoun type
         if u_error_type == t_error_type:
             u_case = u_token.morph.get('Case')
             t_case = t_token.morph.get('Case')
-
+            
+            # Flag mismatched accusative vs dative case
             if u_case != t_case:
                 results.append(
                     GrammarResult(
@@ -592,8 +681,16 @@ def check_accusative_dative_prepositions(user_doc, target_doc):
     return results
 
 def check_extra_words(user_doc, target_doc, protected_spans):
+    """
+    Flags words in the user answer that do not exist in the target sentence.
+
+    Tokens already covered by higher-priority errors can be excluded
+    using protected_spans.
+    """
+
     results = []
 
+    # All alphabetic words in the target sentence
     target_words = {
         t.text.lower()
         for t in target_doc
@@ -604,9 +701,11 @@ def check_extra_words(user_doc, target_doc, protected_spans):
         if not token.is_alpha:
             continue
 
+        # Skip tokens already explained by another rule
         if token.i in protected_spans:
-            continue  # already explained elsewhere
-
+            continue  
+        
+        # Word does not exist in the target sentence
         if token.text.lower() not in target_words:
             results.append(
                 GrammarResult(
@@ -622,6 +721,13 @@ def check_extra_words(user_doc, target_doc, protected_spans):
 
 
 def final_word_check(user_doc, target_doc, max_mismatch=1):
+    """
+    Performs a final redundant check on word alignment.
+
+    Returns True if the number of mismatched or extra words exceeds
+    the allowed threshold.
+    """
+
     user_tokens = [t.text.lower() for t in user_doc if t.is_alpha]
     target_tokens = [t.text.lower() for t in target_doc if t.is_alpha]
 
@@ -633,6 +739,13 @@ def final_word_check(user_doc, target_doc, max_mismatch=1):
     return False
 
 def resolve_conflicts(results):
+    """
+    Resolves overlapping grammar errors by priority.
+
+    Keeps only the highest-priority error per token span and preserves
+    sentence-level errors.
+    """
+
     best_by_span = {}
 
     for r in results:
@@ -647,7 +760,7 @@ def resolve_conflicts(results):
     resolved = []
     seen = set()
 
-    # Add span-based results (deduped)
+    # Add span-based results without duplicates
     for r in best_by_span.values():
         if id(r) not in seen:
             resolved.append(r)
@@ -658,6 +771,7 @@ def resolve_conflicts(results):
         if r.spans is None:
             resolved.append(r)
 
+    # Ranks errors by their error priority
     return sorted(
         resolved,
         key=lambda r: (-r.priority, r.spans[0] if r.spans else -1)
